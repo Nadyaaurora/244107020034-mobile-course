@@ -70,7 +70,9 @@ class DashboardPage extends StatelessWidget {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final columns = constraints.maxWidth >= kWideBreakpoint ? 2 : 1;
+          final columns = 
+            constraints.maxWidth >= kWideBreakpoint ? 2 : 1;
+            
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
                 child: Column(
@@ -87,12 +89,12 @@ class DashboardPage extends StatelessWidget {
                 mainAxisSpacing: 16,
                 childAspectRatio: 2.6,
                 children: const [
-                  DashboardCard(icon: Icons.assignment, title: 'Assignments', value: '8'),
-                  DashboardCard(icon: Icons.calendar_month, title: 'Attendance', value: '92%'),
-                  DashboardCard(icon: Icons.work, title: 'Portfolio', value: 'Ready'),
-                  DashboardCard(icon: Icons.date_range, title: 'Current week', value: '02'),
-                  DashboardCard(icon: Icons.task_alt, title: 'Completed Tasks', value: '15'),
-                  DashboardCard(icon: Icons.school, title: 'Courses', value: '26'),
+                  InfoCard(icon: Icons.assignment, title: 'Assignments', value: '8'),
+                  InfoCard(icon: Icons.calendar_month, title: 'Attendance', value: '92%'),
+                  InfoCard(icon: Icons.work, title: 'Portfolio', value: 'Ready'),
+                  InfoCard(icon: Icons.date_range, title: 'Current week', value: '02'),
+                  InfoCard(icon: Icons.task_alt, title: 'Completed Tasks', value: '15'),
+                  InfoCard(icon: Icons.school, title: 'Courses', value: '26'),
                 ],
               ),
             ]),
@@ -164,8 +166,8 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-class DashboardCard extends StatelessWidget {
-  const DashboardCard({ required this.icon, required this.title, required this.value, super.key});
+class InfoCard extends StatelessWidget {
+  const InfoCard({ required this.icon, required this.title, required this.value, super.key});
   final IconData icon;
   final String title;
   final String value;
