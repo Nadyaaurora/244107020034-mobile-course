@@ -18,10 +18,39 @@ class _PagedPostPageState extends ConsumerState<PagedPostPage> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(pagedPostsProvider.notifier).loadFirstPage().then((_) {
+          _maybeLoadMoreIfNotScrollable();
+        });
+      }
+    });
+
     _controller.addListener(() {
-      if (_controller.position.pixels >=
-          _controller.position.maxScrollExtent - 200) {
+      if (!_controller.hasClients) return;
+      final position = _controller.position;
+      if (!position.hasContentDimensions) return;
+      if (position.pixels >= position.maxScrollExtent - 200) {
         ref.read(pagedPostsProvider.notifier).loadNextPage();
+      }
+    });
+  }
+
+  void _maybeLoadMoreIfNotScrollable() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_controller.hasClients) return;
+      final position = _controller.position;
+      if (!position.hasContentDimensions) return;
+
+      final state = ref.read(pagedPostsProvider);
+      if (position.maxScrollExtent == 0 &&
+          state.hasMore &&
+          !state.isLoading &&
+          !state.isLoadingMore) {
+        ref.read(pagedPostsProvider.notifier).loadNextPage().then((_) {
+          _maybeLoadMoreIfNotScrollable();
+        });
       }
     });
   }
@@ -34,6 +63,10 @@ class _PagedPostPageState extends ConsumerState<PagedPostPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(pagedPostsProvider, (previous, next) {
+      _maybeLoadMoreIfNotScrollable();
+    });
+
     final state = ref.watch(pagedPostsProvider);
     if (state.isLoading && state.items.isEmpty) {
       return Scaffold(
