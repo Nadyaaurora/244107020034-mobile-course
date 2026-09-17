@@ -7,24 +7,31 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:week4_api/main.dart';
+import 'package:week4_api/data/paged_posts.dart';
+import 'package:week4_api/pages/paged_post_page.dart';
+
+class _FakePagedPostsNotifier extends PagedPostsNotifier {
+  @override
+  PagedPostsState build() => const PagedPostsState(hasMore: false);
+}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('aplikasi berjalan di dalam ProviderScope', (
+    WidgetTester tester,
+  ) async {
+    // ProviderScope diperlukan karena halaman utama membaca provider Riverpod.
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          pagedPostsProvider.overrideWith(_FakePagedPostsNotifier.new),
+        ],
+        child: const MaterialApp(home: PagedPostPage()),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // App bar membuktikan widget utama berhasil dibuat tanpa error provider.
+    expect(find.text('Posts Paged'), findsOneWidget);
   });
 }
