@@ -45,14 +45,26 @@ class PostListNotifier extends AsyncNotifier<List<Post>> {
 
     try {
       final repository = ref.read(postRepositoryProvider);
-      state = AsyncData(await repository.fetchPosts());
+      final posts = await repository.fetchPosts();
+
+      await repository.saveCachedPosts(posts);
+
+      state = AsyncData(posts);
     } catch (e, st) {
-      state = AsyncError(e, st);
+      try {
+        final repository = ref.read(postRepositoryProvider);
+        final cached = await repository.readCachedPosts();
+
+        state = AsyncData(cached);
+      } catch (_) {
+        state = AsyncError(e, st);
+      }
     }
   }
 }
 
-final postListProvider = AsyncNotifierProvider<PostListNotifier, List<Post>>(
+final postListProvider =
+    AsyncNotifierProvider<PostListNotifier, List<Post>>(
   PostListNotifier.new,
   retry: (retryCount, error) => null,
 );

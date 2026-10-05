@@ -75,7 +75,14 @@ class PostRepository {
 
   Future<List<Post>> loadPostsCacheFirst() async {
     final cached = await readCachedPosts();
-    refreshPostsInBackground();
-    return cached;
+
+    if (cached.isNotEmpty) {
+      refreshPostsInBackground();
+      return cached;
+    }
+
+    final posts = await fetchPosts();
+    await saveCachedPosts(posts);
+    return posts;
   }
 }
