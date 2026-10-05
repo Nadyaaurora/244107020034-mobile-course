@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
 import '../data/local/note.dart';
 
 class NoteTile extends StatelessWidget {
@@ -15,6 +15,9 @@ class NoteTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: () {
+        context.push('/note/${note.id}');
+      },
       title: Text(note.title),
       subtitle: Text(
         note.body.isEmpty
