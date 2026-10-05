@@ -38,6 +38,14 @@ class NotesNotifier extends AsyncNotifier<List<Note>> {
 
     await loadNotes();
   }
+
+  Future<void> sync() async {
+    await syncNotes(
+      ref.read(noteRepositoryProvider),
+    );
+
+    await loadNotes();
+  }
 }
 
 class NotesPage extends ConsumerWidget {
@@ -132,9 +140,7 @@ class NotesPage extends ConsumerWidget {
                   Text('Belum sync: $dirtyCount'),
                   IconButton(
                     onPressed: () {
-                      ref
-                          .read(notesProvider.notifier)
-                          .loadNotes();
+                      ref.read(notesProvider.notifier).sync();
                     },
                     icon: const Icon(Icons.sync),
                   ),
