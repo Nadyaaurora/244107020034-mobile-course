@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/local/note.dart';
 import '../data/repositories/note_repository.dart';
+import 'note_tile.dart';
 
 final noteRepositoryProvider = Provider((ref) => NoteRepository());
 
@@ -164,35 +165,18 @@ class NotesPage extends ConsumerWidget {
             );
           }
 
-          return ListView.builder(
+           return ListView.builder(
             itemCount: items.length,
             itemBuilder: (context, index) {
               final note = items[index];
 
-              return ListTile(
-                title: Text(note.title),
-                subtitle: Text(
-                  note.body.isEmpty
-                      ? 'Tidak ada isi'
-                      : note.body,
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (note.dirty)
-                      const Chip(
-                        label: Text('Belum tersinkron'),
-                      ),
-                    IconButton(
-                      onPressed: () {
-                        ref
-                            .read(notesProvider.notifier)
-                            .deleteNote(note.id!);
-                      },
-                      icon: const Icon(Icons.delete),
-                    ),
-                  ],
-                ),
+              return NoteTile(
+                note: note,
+                onDelete: () {
+                  ref
+                      .read(notesProvider.notifier)
+                      .deleteNote(note.id!);
+                },
               );
             },
           );
