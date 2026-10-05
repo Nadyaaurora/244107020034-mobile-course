@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_client.dart';
 import 'models/post.dart';
 import 'repositories/post_repository.dart';
+import 'sync.dart';
 
 final dioProvider = Provider<Dio>((ref) => createDio());
 
@@ -34,10 +35,10 @@ class PostListNotifier extends AsyncNotifier<List<Post>> {
     final forceOffline = ref.watch(forceOfflineProvider);
 
     if (forceOffline) {
-      return repository.readCachedPosts();
+      return readCachedPosts();
     }
 
-    return repository.loadPostsCacheFirst();
+    return loadPostsCacheFirst(repository);
   }
 
   Future<void> refresh() async {
@@ -47,13 +48,12 @@ class PostListNotifier extends AsyncNotifier<List<Post>> {
       final repository = ref.read(postRepositoryProvider);
       final posts = await repository.fetchPosts();
 
-      await repository.saveCachedPosts(posts);
+      await saveCachedPosts(posts);
 
       state = AsyncData(posts);
     } catch (e, st) {
       try {
-        final repository = ref.read(postRepositoryProvider);
-        final cached = await repository.readCachedPosts();
+        final cached = await readCachedPosts();
 
         state = AsyncData(cached);
       } catch (_) {
@@ -68,42 +68,3 @@ final postListProvider =
   PostListNotifier.new,
   retry: (retryCount, error) => null,
 );
-
-Future<List<Post>> readPostsOnce(ProviderContainer container) {
-  final completer = Completer<List<Post>>();
-
-  final sub = container.listen<AsyncValue<List<Post>>>(
-    postListProvider,
-    (previous, next) {
-      if (next.isLoading || completer.isCompleted) return;
-
-      next.whenData(completer.complete);
-
-      if (next.hasError) {
-        completer.completeError(
-          next.error ?? StateError('unknown error'),
-          next.stackTrace ?? StackTrace.empty,
-        );
-      }
-    },
-    fireImmediately: true,
-  );
-
-  return completer.future.whenComplete(sub.close);
-}
-
-Future<Object?> readPostsErrorOnce(ProviderContainer container) {
-  final completer = Completer<Object?>();
-
-  final sub = container.listen<AsyncValue<List<Post>>>(
-    postListProvider,
-    (previous, next) {
-      if (next.isLoading || completer.isCompleted) return;
-
-      completer.complete(next.error);
-    },
-    fireImmediately: true,
-  );
-
-  return completer.future.whenComplete(sub.close);
-}

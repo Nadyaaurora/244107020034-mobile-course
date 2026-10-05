@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local/note.dart';
 import '../data/repositories/note_repository.dart';
 import 'note_tile.dart';
+import '../data/sync.dart';
 
 final noteRepositoryProvider = Provider((ref) => NoteRepository());
 
