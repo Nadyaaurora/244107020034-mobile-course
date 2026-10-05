@@ -16,7 +16,10 @@ class PrefsRepository {
 
   Future<void> markOpenedNow() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_lastOpenedKey, DateTime.now().toIso8601String());
+    await prefs.setString(
+      _lastOpenedKey,
+      DateTime.now().toIso8601String(),
+    );
   }
 
   Future<String?> getLastOpened() async {
