@@ -11,12 +11,13 @@ import 'pages/home_page.dart';
 import 'pages/announcement_page.dart';
 import 'providers/auth_provider.dart';
 import 'services/push_service.dart';
+import 'routes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   runApp(const ProviderScope(child: MyApp(enablePush: true)));
 }
 
@@ -41,19 +42,19 @@ class _MyAppState extends ConsumerState<MyApp> {
       redirect: (context, state) {
         final loggedIn = ref.read(authStateProvider).value ?? false;
 
-        final goingLogin = state.matchedLocation == '/login';
+        final goingLogin = state.matchedLocation == loginRoute;
 
-        if (!loggedIn && !goingLogin) return '/login';
+        if (!loggedIn && !goingLogin) return loginRoute;
 
-        if (loggedIn && goingLogin) return '/';
+        if (loggedIn && goingLogin) return homeRoute;
 
         return null;
       },
       routes: [
-        GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
-        GoRoute(path: '/', builder: (_, _) => const HomePage()),
+        GoRoute(path: loginRoute, builder: (_, _) => const LoginPage()),
+        GoRoute(path: homeRoute, builder: (_, _) => const HomePage()),
         GoRoute(
-          path: '/pengumuman/:id',
+          path: announcementRoute,
           builder: (_, state) {
             return AnnouncementPage(id: state.pathParameters['id'] ?? '');
           },

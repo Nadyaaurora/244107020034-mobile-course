@@ -1,4 +1,4 @@
-
+import '../routes.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -165,8 +165,8 @@ class PushService {
 
     try {
       await onTokenAvailable!(token);
-    } catch (error) {
-      debugPrint('Gagal memproses pembaruan token FCM: $error');
+    } catch (_) {
+      debugPrint('Gagal memproses pembaruan token FCM.');
     }
   }
 
@@ -205,7 +205,7 @@ class PushService {
   }
 
   void _handleMessageNavigation(RemoteMessage message) {
-    _navigateToRoute(message.data['route']);
+    _navigateToRoute(routeFromMessage(message.data));
   }
 
   void _navigateToRoute(Object? value) {

@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../data/api_client.dart';
 import '../data/auth_repository.dart';
 import '../data/token_store.dart';
 
@@ -10,8 +13,24 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository();
 });
 
-final authStateProvider =
-    AsyncNotifierProvider<AuthNotifier, bool>(AuthNotifier.new);
+final apiBaseUrlProvider = Provider<String>((ref) {
+  return 'https://example-campus-api.test';
+});
+
+final apiClientProvider = Provider<Dio>((ref) {
+  return buildApiClient(
+    ref.watch(tokenStoreProvider),
+    ref.watch(authRepositoryProvider),
+    baseUrl: ref.watch(apiBaseUrlProvider),
+    onSessionExpired: () async {
+      ref.read(authStateProvider.notifier).handleSessionExpired();
+    },
+  );
+});
+
+final authStateProvider = AsyncNotifierProvider<AuthNotifier, bool>(
+  AuthNotifier.new,
+);
 
 class AuthNotifier extends AsyncNotifier<bool> {
   @override
@@ -30,10 +49,7 @@ class AuthNotifier extends AsyncNotifier<bool> {
 
       await ref
           .read(tokenStoreProvider)
-          .save(
-            access: session.access,
-            refresh: session.refresh,
-          );
+          .save(access: session.access, refresh: session.refresh);
 
       return true;
     });
@@ -42,5 +58,9 @@ class AuthNotifier extends AsyncNotifier<bool> {
   Future<void> logout() async {
     await ref.read(tokenStoreProvider).clear();
     ref.invalidateSelf();
+  }
+
+  void handleSessionExpired() {
+    state = const AsyncData(false);
   }
 }
