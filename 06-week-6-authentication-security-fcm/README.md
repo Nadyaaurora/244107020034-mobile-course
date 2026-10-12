@@ -88,7 +88,7 @@ Tandai bagian yang BERBEDA untuk Android 13+ vs iOS,
 dan bagian yang tidak boleh mengakses BuildContext.
 ```
 
-Output awal AI, daftar perbaikan manual, tabel hasil uji tiga app state, serta hasil `flutter analyze` dan `flutter test` untuk bagian ini didokumentasikan pada folder [`docs/`](./docs/).
+Output awal AI, daftar perbaikan manual, tabel hasil uji tiga app state, serta hasil `flutter analyze` dan `flutter test` untuk bagian ini didokumentasikan pada folder [`docs/`](./campus_notify/docs/).
 
 ---
 
