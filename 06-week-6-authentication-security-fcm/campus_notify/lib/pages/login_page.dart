@@ -107,7 +107,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   passwordController.text,
                                 );
 
-                            if (!mounted) return;
+                            if (!context.mounted) return;
 
                             final state = ref.read(authStateProvider);
 
