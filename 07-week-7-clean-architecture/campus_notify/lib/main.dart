@@ -18,7 +18,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  runApp(const ProviderScope(child: MyApp(enablePush: true)));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -63,8 +63,8 @@ class _MyAppState extends ConsumerState<MyApp> {
     );
 
     if (widget.enablePush) {
-      _pushService = PushService(onRouteRequested: (route) => router.go(route));
-      unawaited(_pushService!.initialize());
+      // _pushService = PushService(onRouteRequested: (route) => router.go(route));
+      // unawaited(_pushService!.initialize());
     }
   }
 
