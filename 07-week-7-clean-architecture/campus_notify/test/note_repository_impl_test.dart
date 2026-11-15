@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart';
+
 import 'package:campus_notify/core/failures.dart';
 import 'package:campus_notify/features/notes/data/repositories/note_repository_impl.dart';
 
@@ -18,10 +18,7 @@ void main() {
 
     expect(result.note, isNull);
     expect(result.failure, isA<LocalFailure>());
-    expect(
-      result.failure?.message,
-      'Judul catatan tidak boleh kosong.',
-    );
+    expect(result.failure?.message, 'Judul catatan tidak boleh kosong.');
     expect(databaseOpened, isFalse);
   });
 
@@ -39,10 +36,7 @@ void main() {
 
     expect(result.note, isNull);
     expect(result.failure, isA<LocalFailure>());
-    expect(
-      result.failure?.message,
-      'Judul catatan tidak boleh kosong.',
-    );
+    expect(result.failure?.message, 'Judul catatan tidak boleh kosong.');
     expect(databaseOpened, isFalse);
   });
 }
