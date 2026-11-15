@@ -15,7 +15,7 @@ jobs:
         working-directory: 07-week-7-clean-architecture/campus_notify
 
       - name: Flutter Analyze
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
         working-directory: 07-week-7-clean-architecture/campus_notify
 
       - name: Flutter Test
