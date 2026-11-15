@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+
 import '../../../../core/failures.dart';
 import '../../domain/entities/note.dart';
 import '../../domain/repositories/note_repository.dart';
@@ -31,14 +32,22 @@ class NoteRepositoryImpl implements NoteRepository {
     required String title,
     String body = '',
   }) async {
+    if (title.trim().isEmpty) {
+      return (
+        note: null,
+        failure: const LocalFailure('Judul catatan tidak boleh kosong.'),
+      );
+    }
+
     try {
       final db = await _openDb();
       final now = DateTime.now();
+      final validTitle = title.trim();
 
       final id = await db.insert(
         'notes',
         NoteModel(
-          title: title,
+          title: validTitle,
           body: body,
           updatedAt: now,
           dirty: true,
@@ -48,7 +57,7 @@ class NoteRepositoryImpl implements NoteRepository {
       return (
         note: Note(
           id: id,
-          title: title,
+          title: validTitle,
           body: body,
           updatedAt: now,
           dirty: true,
