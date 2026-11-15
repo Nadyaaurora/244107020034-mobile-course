@@ -5,7 +5,9 @@ import '../../domain/repositories/note_repository.dart';
 import '../models/note_model.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
-  NoteRepositoryImpl({required this._openDb});
+  NoteRepositoryImpl({
+    required Future<Database> Function() openDb,
+  }) : _openDb = openDb;
 
   final Future<Database> Function() _openDb;
 
@@ -31,14 +33,22 @@ class NoteRepositoryImpl implements NoteRepository {
     required String title,
     String body = '',
   }) async {
+    if (title.trim().isEmpty) {
+      return (
+        note: null,
+        failure: const LocalFailure('Judul catatan tidak boleh kosong.'),
+      );
+    }
+
     try {
       final db = await _openDb();
       final now = DateTime.now();
+      final validTitle = title.trim();
 
       final id = await db.insert(
         'notes',
         NoteModel(
-          title: title,
+          title: validTitle,
           body: body,
           updatedAt: now,
           dirty: true,
@@ -48,7 +58,7 @@ class NoteRepositoryImpl implements NoteRepository {
       return (
         note: Note(
           id: id,
-          title: title,
+          title: validTitle,
           body: body,
           updatedAt: now,
           dirty: true,
@@ -56,7 +66,10 @@ class NoteRepositoryImpl implements NoteRepository {
         failure: null,
       );
     } catch (e) {
-      return (note: null, failure: LocalFailure('Gagal menyimpan catatan: $e'));
+      return (
+        note: null,
+        failure: LocalFailure('Gagal menyimpan catatan: $e'),
+      );
     }
   }
 }
