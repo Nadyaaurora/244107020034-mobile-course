@@ -11,7 +11,7 @@ Profiling awal dilakukan pada aplikasi dalam mode `--profile` untuk mengukur per
 | Metrik Performa | Nilai Pengukuran Baseline | Keterangan / Status |
 |---|:---:|---|
 | **Rata-rata Frame Time** | **28,4 ms** | Melebihi batas anggaran frame 16,67 ms (terjadi penurunan FPS ke ~35 FPS). |
-| **Jumlah Jank (Frame Drop)** | **18 frames** | Terindikasi pada grafik DevTools Performance sebagai bar warna merah dan kuning. |
+| **Jumlah Jank (Frame Drop)** | **18 frames** | Terindikasi pada grafik DevTools Performance sebagai bar warna merah. |
 | **Alokasi Heap Memory** | **42,6 MB** | Beban memori tinggi akibat seluruh 100 elemen dirender sekaligus ke render tree. |
 | **Panggilan Jaringan API** | Berulang tanpa cache | Data diminta ulang dari awal setiap kali komponen widget direkonstruksi. |
 

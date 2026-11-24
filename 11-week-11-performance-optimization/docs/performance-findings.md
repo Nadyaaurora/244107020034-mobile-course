@@ -8,7 +8,7 @@ Dokumen ini memuat catatan hasil profiling menggunakan Flutter DevTools, identif
 
 - **Skenario Pengujian:** Membuka daftar 100 item, melakukan scroll cepat (*fling scroll*), dan memicu perubahan state periodik.
 - **Hasil Pengamatan DevTools Performance:**
-  - Terjadi *frame drop* (jank) berulang dengan indikator warna **merah** (> 32 ms) dan **kuning** (16–32 ms).
+  - Terjadi *frame drop* (jank) berulang dengan indikator bar warna **merah** (> 16,67 ms).
   - Rata-rata frame time mencapai **28,4 ms** (turun ke kisaran 30–35 FPS).
   - Puncak Flame Chart didominasi oleh eksekusi berulang method `build()` dan proses *layout* menyeluruh pada pohon widget yang panjang.
 

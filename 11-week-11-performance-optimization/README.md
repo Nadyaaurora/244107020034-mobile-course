@@ -1,4 +1,4 @@
-# Week 11 - Optimasi Performa (Performance Optimization)
+# Week 11 - Optimasi Performa
 
 **Nama:** Nadya Aurora Gebi Agista
 
@@ -6,8 +6,8 @@
 
 ---
 
-## 1. Deskripsi Modul dan Pipeline Rendering
-Praktikum Minggu 11 berfokus pada optimasi performa aplikasi mobile Flutter menggunakan Flutter DevTools (CPU dan Memory Profiling), pengurangan *widget rebuild* yang tidak diperlukan, penerapan *lazy loading* dan *pagination*, serta implementasi strategi *caching* jaringan (Stale-While-Revalidate).
+## 1. Konsep Pipeline Rendering dan Optimasi Performa
+Praktikum ini berfokus pada optimasi performa aplikasi mobile Flutter menggunakan Flutter DevTools (CPU dan Memory Profiling), pengurangan *widget rebuild* yang tidak diperlukan, penerapan *lazy loading* dan *pagination*, serta implementasi strategi *caching* jaringan (Stale-While-Revalidate).
 
 ### Pipeline Rendering & Frame Budget
 $$\text{UI Thread (Build, Layout, Paint)} \longrightarrow \text{Raster Thread (Composite, Rasterize)} \longrightarrow \text{Frame Budget: } < 16,67\text{ ms (60 FPS)}$$
@@ -51,22 +51,26 @@ $$\text{UI Thread (Build, Layout, Paint)} \longrightarrow \text{Raster Thread (C
 1. **Optimasi mana yang memberikan dampak terbesar dan mengapa?**  
    
    **Jawab:**  
-   Optimasi yang memberikan dampak terbesar adalah penggantian kombinasi SingleChildScrollView dan Column menjadi ListView.builder yang dipadukan dengan infinite scroll pagination. Pada implementasi awal sebelum optimasi, aplikasi langsung menginstansiasi dan menyusun tata letak untuk seluruh 100 kartu item secara bersamaan ke render tree meskipun pengguna hanya melihat beberapa item teratas. Hal ini membebani UI thread dan GPU raster thread sehingga memicu frame drop parah saat scrolling. Dengan menerapkan ListView.builder, Flutter engine hanya membangun widget yang benar-benar tampak di viewport layar pengguna dan secara otomatis mendaur ulang elemen yang tergeser keluar. Pendekatan ini langsung memangkas rata-rata frame time dari 28,4 ms menjadi 8,2 ms serta mengeliminasi jank secara menyeluruh.
+
+   Optimasi yang memberikan dampak terbesar adalah mengganti kombinasi SingleChildScrollView dan Column menjadi ListView.builder yang dipadukan dengan infinite scroll pagination. Pada implementasi awal, seluruh 100 kartu item langsung dibangun sehingga membebani proses rendering meskipun sebagian besar belum terlihat di layar. Dengan ListView.builder, widget hanya dibangun ketika diperlukan sehingga penggunaan sumber daya menjadi lebih efisien. Hasilnya, rata-rata frame time berhasil turun dari 28,4 ms menjadi 8,2 ms dan scrolling menjadi lebih lancar.
 
 2. **Bagaimana Anda memverifikasi bahwa optimasi benar-benar bekerja (bukan placebo)?**  
    
-   **Jawab:**  
-   Verifikasi dilakukan secara empiris dan kuantitatif menggunakan Flutter DevTools Performance pada mode build profile (`flutter run --profile`). Melalui grafik frame time dan Flame Chart, performa diukur sebelum dan sesudah optimasi dengan skenario beban yang identik, yaitu navigasi dan scrolling cepat. Sebelum perbaikan, DevTools mencatat 18 frame jank berwarna merah dan kuning dengan frame time rata-rata 28,4 ms. Setelah optimasi diterapkan, seluruh frame drop berhasil dihilangkan dan grafik frame berada stabil di zona hijau dengan rata-rata 8,2 ms (stabil pada 60 FPS). Selain itu, keabsahan fungsional cache Stale-While-Revalidate dan pagination dibuktikan lewat pengujian unit test dan widget test pada direktori test yang seluruhnya berstatus lulus.
+   **Jawab:** 
+
+   Verifikasi dilakukan menggunakan Flutter DevTools Performance pada mode profile dengan skenario pengujian yang sama sebelum dan sesudah optimasi. Pengukuran dilakukan melalui grafik frame time untuk melihat perubahan performa saat aplikasi melakukan scrolling. Hasilnya menunjukkan penurunan rata-rata frame time dari 28,4 ms menjadi 8,2 ms. Selain itu, fungsionalitas cache Stale-While-Revalidate dan pagination diuji menggunakan unit test dan widget test, dengan seluruh pengujian berhasil dilewati.
 
 3. **Trade-off apa yang Anda hadapi (misalnya kompleksitas kode vs performa)?**  
    
    **Jawab:**  
-   Trade-off utama yang dihadapi adalah meningkatnya kompleksitas kode dan bertambahnya baris kode yang harus dikelola. Pendekatan unoptimized lebih sederhana dan cepat ditulis karena seluruh tampilan digabung dalam satu class widget dengan data statis. Sebaliknya, pendekatan optimized mengharuskan pemisahan widget menjadi class mandiri, penambahan keyword const, konfigurasi ScrollController beserta listener manual untuk pagination, pengelolaan lifecycle dispose agar tidak terjadi memory leak, serta pembuatan layer repository tersendiri untuk menangani in-memory cache. Meskipun struktur kode menjadi lebih rumit dan memerlukan kedisiplinan perancangan yang tinggi, hasil peningkatan performa rendering dan efisiensi memori yang diperoleh sangat sepadan.
+   
+   Trade-off utama yang dihadapi adalah meningkatnya kompleksitas kode untuk mendapatkan performa yang lebih baik. Optimasi membutuhkan pemisahan widget, pengelolaan ScrollController, penambahan repository untuk menangani in-memory cache, serta pengaturan lifecycle melalui dispose(). Meskipun struktur kode menjadi lebih kompleks dan membutuhkan pengelolaan yang lebih teliti, perubahan tersebut memberikan peningkatan performa rendering dan efisiensi penggunaan memori.
 
 4. **Kapan sebaiknya optimasi premature dihindari?**  
    
    **Jawab:**  
-   Optimasi premature sebaiknya dihindari ketika aplikasi masih dalam tahap awal eksplorasi ide, pembuktian konsep, atau perancangan prototipe awal di mana kebutuhan fitur dan tata letak masih sering berubah. Menerapkan optimasi rumit terlalu dini, seperti memecah hierarki widget secara berlebihan atau merancang strategi caching berlapis tanpa adanya data beban riil, dapat memperlambat kecepatan pengembangan dan membuat kode sulit dimodifikasi. Langkah yang tepat adalah menulis kode yang bersih, mudah dibaca, dan modular terlebih dahulu. Optimasi baru dilakukan secara terarah berdasarkan bukti empiris dari Flutter DevTools saat ditemukan bottleneck nyata atau ketika aplikasi dipersiapkan menuju tahap produksi.
+   
+   Optimasi premature sebaiknya dihindari ketika aplikasi masih dalam tahap awal pengembangan dan kebutuhan fitur masih sering berubah. Penerapan optimasi yang terlalu rumit tanpa adanya masalah performa yang nyata justru dapat memperlambat pengembangan dan menyulitkan pemeliharaan kode. Sebaiknya, pengembangan dimulai dengan kode yang bersih dan terstruktur. Optimasi kemudian dilakukan berdasarkan hasil pengukuran menggunakan Flutter DevTools ketika ditemukan kendala performa.
 
 ---
 

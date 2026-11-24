@@ -4,13 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/item_model.dart';
 import '../../data/item_repository.dart';
 
-/// Halaman SESUDAH Optimasi:
-/// 1. Menggunakan ListView.builder (Lazy loading item viewport)
-/// 2. Infinite scroll pagination bertahap per 15 item
-/// 3. Ekstraksi item ke StatelessWidget terpisah dengan const constructor
-/// 4. RepaintBoundary untuk mengisolasi render box
-/// 5. Tear-off method reference
-/// 6. Stale-While-Revalidate caching via ItemRepository
 class OptimizedView extends ConsumerStatefulWidget {
   const OptimizedView({super.key});
 
@@ -97,7 +90,6 @@ class _OptimizedViewState extends ConsumerState<OptimizedView> {
         onRefresh: _onRefresh,
         child: Column(
           children: [
-            // Banner Sukses Optimasi
             Container(
               padding: const EdgeInsets.all(12),
               color: Colors.green.shade50,
@@ -119,8 +111,6 @@ class _OptimizedViewState extends ConsumerState<OptimizedView> {
                 ],
               ),
             ),
-
-            // ListView.builder murni viewport
             Expanded(
               child: ListView.builder(
                 controller: _scrollController,
@@ -140,7 +130,6 @@ class _OptimizedViewState extends ConsumerState<OptimizedView> {
                   }
 
                   final item = _items[index];
-                  // Ekstraksi widget dengan RepaintBoundary
                   return RepaintBoundary(
                     child: OptimizedItemTile(item: item, onTap: _handleItemTap),
                   );
@@ -154,7 +143,6 @@ class _OptimizedViewState extends ConsumerState<OptimizedView> {
   }
 }
 
-/// Widget item terisolasi dengan const constructor
 class OptimizedItemTile extends StatelessWidget {
   final Item item;
   final ValueChanged<Item> onTap;
